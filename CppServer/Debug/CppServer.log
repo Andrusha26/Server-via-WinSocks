@@ -1,0 +1,5 @@
+﻿  CppServer.cpp
+  Server.cpp
+  Generating Code...
+f:\projects\cppserver\cppserver\server.cpp(45): warning C4172: returning address of local variable or temporary: clientSocket
+  CppServer.vcxproj -> F:\Projects\CppServer\Debug\CppServer.exe
