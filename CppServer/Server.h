@@ -1,5 +1,6 @@
 #pragma once
 #include <winsock2.h>
+#include "HttpParser.h"
 
 class Server
 {
@@ -13,6 +14,8 @@ private:
 
 	int _currentConnections = 0;
 	
+	HttpParser * _httpParser;
+
 	void addConnection();
 	void releaseConnection();
 
@@ -22,7 +25,7 @@ private:
 	void acceptAndBroadcast();
 
 	void broadcastMessages(SOCKET);
-	int receiveMessage(SOCKET &, char *);
+	void receiveMessage(SOCKET &, char *);
 	int sendMessage(SOCKET &, const char* const&);
 
 	void closeConnection(SOCKET &);
