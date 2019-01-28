@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "Server.h"
+#include "WinSockHelper.h"
 
 #include <ws2tcpip.h>
 #include <iostream>
-#include "WinSockHelper.h"
 #include <thread>
 #include <vector>
-#include <exception>
 #include <sstream>
-#include <iomanip>
+#include <fstream>
+#include <iterator>
 
 void Server::addConnection()
 {
@@ -72,40 +72,27 @@ void Server::acceptAndBroadcast()
 void Server::broadcastMessages(SOCKET clientSocket)
 {
 	char * buffer = new char[DefaultBufferLength];
+	while (_running) {
+		int recvResult = recv(clientSocket, buffer, DefaultBufferLength, 0);
 
-	int responseLength = receiveMessage(clientSocket, buffer);
-    /*
-	if (responseLength == 0) {
-		closeConnection(clientSocket);
-		return;
-	}*/
-	//TODO parse headers
+		if (recvResult > 0) {
+			IHandler *handler = _httpParser->parseHttpRequest(buffer);
+			handler->handle(clientSocket, buffer, recvResult);
+		}
+		else if (recvResult == 0) {
+			closeConnection(clientSocket);
+			return;
+		}
+		else if (recvResult <= 0) {
+			std::cout << "recv failed with error in " << clientSocket << " socket: " << WSAGetLastError() << std::endl;
+			closesocket(clientSocket);
+			WSACleanup();
 
-	const char * responseString = "This is reponse";
-	sendMessage(clientSocket, responseString);
-
+			_running = false;
+			throw new std::exception("Receive is failed.");
+		}
+	}
 	closeConnection(clientSocket);
-}
-
-int Server::receiveMessage(SOCKET & clientSocket, char * buffer)
-{
-	int recvResult = recv(clientSocket, buffer, DefaultBufferLength, 0);
-
-	if (recvResult > 0) {
-		std::cout << "Bytes received by " << clientSocket << " socket: " << recvResult << std::endl;
-	}
-	else if (recvResult == 0)
-		return 0;
-	else if (recvResult <= 0) {
-		std::cout << "recv failed with error in " << clientSocket << " socket: " << WSAGetLastError() << std::endl;
-		closesocket(clientSocket);
-		WSACleanup();
-
-		_running = false;
-		throw new std::exception("Receive is failed.");
-	}
-
-	return recvResult;
 }
 
 int Server::sendMessage(SOCKET & clientSocket, const char * const & body = nullptr)
@@ -173,6 +160,8 @@ Server::Server()
 		winSockHelper.initializeSocket(Port);
 		winSockHelper.bindListenSocket(_listenSocket);
 
+		_httpParser = new HttpParser();
+
 		_running = true;
 	}
 	catch (std::exception& e)
@@ -185,4 +174,5 @@ Server::Server()
 
 Server::~Server()
 {
+	delete _httpParser;
 }

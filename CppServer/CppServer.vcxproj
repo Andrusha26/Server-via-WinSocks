@@ -151,12 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FileHandler.h" />
+    <ClInclude Include="HttpParser.h" />
+    <ClInclude Include="IHandler.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="WinSockHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppServer.cpp" />
+    <ClCompile Include="FileHandler.cpp" />
+    <ClCompile Include="HttpParser.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
