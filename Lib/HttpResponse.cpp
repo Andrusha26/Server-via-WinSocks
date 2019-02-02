@@ -28,6 +28,8 @@ std::string HttpResponse::toString()
 		response << (*hdrsItr).first << ": " << (*hdrsItr).second << Consts::NewLine;
 	}
 
+	response << Consts::NewLine << _body;
+
 	return response.str();
 }
 
@@ -44,6 +46,10 @@ void HttpResponse::setHeaders(std::map<std::string, std::string> &headers)
 void HttpResponse::setDefaultHttpVersion()
 {
 	_httpVersion = "HTTP/1.1";
+}
+
+void HttpResponse::setBody(const char * body) {
+	_body = body;
 }
 
 HttpResponse::HttpResponse()

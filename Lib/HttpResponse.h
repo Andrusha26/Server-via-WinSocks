@@ -9,7 +9,7 @@ class HttpResponse
 	std::string _message;
 	std::map<std::string, std::string> _headers;
 
-	char * _body;
+	const char * _body;
 public:
 
 	HttpResponse(int);
@@ -18,6 +18,7 @@ public:
 	std::string toString();
 	void clearHeaders();
 	void setHeaders(std::map<std::string, std::string>&);
+	void setBody(const char *);
 
 	void setDefaultHttpVersion();
 

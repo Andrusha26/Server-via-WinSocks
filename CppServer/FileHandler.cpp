@@ -78,6 +78,8 @@ HttpResponse * FileHandler::genereteOkResponse(std::string &body)
 	headers.insert(std::pair<std::string, std::string>("Content-Type", "text/html"));
 	response->setHeaders(headers);
 
+	response->setBody(body.c_str());
+
 	return response;
 }
 
