@@ -5,10 +5,7 @@
 class Server
 {
 private:
-	const char * Port = "27015";
-	const int DefaultBufferLength = 1024;
-	int MaxConnections = 1;
-
+	
 	SOCKET _listenSocket;
 	bool _running = false;
 
@@ -25,7 +22,6 @@ private:
 	void acceptAndBroadcast();
 
 	void broadcastMessages(SOCKET);
-	void receiveMessage(SOCKET &, char *);
 	int sendMessage(SOCKET &, const char* const&);
 
 	void closeConnection(SOCKET &);

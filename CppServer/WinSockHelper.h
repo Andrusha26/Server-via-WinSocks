@@ -16,6 +16,7 @@ public:
 	void initializeSocket(const char *);
 	void bindListenSocket(SOCKET &);
 
+	static void cleanUp(SOCKET);
 	WinSockHelper();
 	~WinSockHelper();
 };

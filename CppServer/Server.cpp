@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Server.h"
 #include "WinSockHelper.h"
+#include "Consts.h"
+#include "HttpRequest.h"
 
 #include <ws2tcpip.h>
 #include <iostream>
@@ -27,8 +29,7 @@ void Server::startListening()
 
 	if (listenResult == SOCKET_ERROR) {
 		std::cout << "listen failed with error: \n" << WSAGetLastError() << std::endl;
-		closesocket(_listenSocket);
-		WSACleanup();
+		WinSockHelper::cleanUp(_listenSocket);
 	}
 }
 
@@ -38,8 +39,7 @@ SOCKET &Server::acceptConnection()
 
 	if (clientSocket == INVALID_SOCKET) {
 		std::cout << "accept failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(_listenSocket);
-		WSACleanup();
+		WinSockHelper::cleanUp(_listenSocket);
 	}
 
 	return clientSocket;
@@ -50,11 +50,13 @@ void Server::acceptAndBroadcast()
 	while (_running) {
 		std::vector<std::thread*> threads;
 
-		while (_currentConnections < MaxConnections && _running) {
+		//TODO add release logic
+		while (_currentConnections < Consts::MaxConnections && _running) {
 			SOCKET clientSocket = acceptConnection();
 			std::cout << "socket " << clientSocket << " was accepted." << std::endl;
-			//broadcastMessages(clientSocket);
 			std::thread *broadcastThread = new std::thread(&Server::broadcastMessages, this, clientSocket);
+
+			threads.push_back(broadcastThread);
 		}
 
 		if (!_running) {
@@ -65,34 +67,34 @@ void Server::acceptAndBroadcast()
 			threadIterator != threads.end();
 			threadIterator++) {
 			(*threadIterator)->join();
+			//TODO delete thread?
 		}
 	}
 }
 
 void Server::broadcastMessages(SOCKET clientSocket)
 {
-	char * buffer = new char[DefaultBufferLength];
+	char * buffer = new char[Consts::DefaultBufferLength];
 	while (_running) {
-		int recvResult = recv(clientSocket, buffer, DefaultBufferLength, 0);
+		int recvResult = recv(clientSocket, buffer, Consts::DefaultBufferLength, 0);
 
 		if (recvResult > 0) {
-			IHandler *handler = _httpParser->parseHttpRequest(buffer);
-			handler->handle(clientSocket, buffer, recvResult);
-		}
-		else if (recvResult == 0) {
-			closeConnection(clientSocket);
-			return;
+			HttpRequest request(buffer, recvResult);
+
+			IHandler *handler = _httpParser->parseHttpRequest(request);
+			handler->handle(clientSocket, request);
+			//delete handler;
 		}
 		else if (recvResult <= 0) {
 			std::cout << "recv failed with error in " << clientSocket << " socket: " << WSAGetLastError() << std::endl;
-			closesocket(clientSocket);
-			WSACleanup();
+			WinSockHelper::cleanUp(clientSocket);
 
 			_running = false;
-			throw new std::exception("Receive is failed.");
 		}
 	}
+
 	closeConnection(clientSocket);
+	delete buffer;
 }
 
 int Server::sendMessage(SOCKET & clientSocket, const char * const & body = nullptr)
@@ -121,8 +123,7 @@ int Server::sendMessage(SOCKET & clientSocket, const char * const & body = nullp
 	
 	if (sendResult == SOCKET_ERROR) {
 		std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(clientSocket);
-		WSACleanup();
+		WinSockHelper::cleanUp(clientSocket);
 
 		_running = false;
 		throw new std::exception("Cannot send message.");
@@ -137,8 +138,7 @@ void Server::closeConnection(SOCKET & clientSocket)
 	int shutDownResult = shutdown(clientSocket, SD_SEND);
 	if (shutDownResult == SOCKET_ERROR) {
 		std::cout << "shutdown failed with error: \n" << WSAGetLastError();
-		closesocket(clientSocket);
-		WSACleanup();
+		WinSockHelper::cleanUp(clientSocket);
 	}
 	
 	closesocket(clientSocket);
@@ -157,7 +157,7 @@ Server::Server()
 	try {
 		WinSockHelper winSockHelper;
 
-		winSockHelper.initializeSocket(Port);
+		winSockHelper.initializeSocket(Consts::Port);
 		winSockHelper.bindListenSocket(_listenSocket);
 
 		_httpParser = new HttpParser();

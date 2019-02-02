@@ -106,6 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Constants;$(SolutionDir)\Lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,6 +163,7 @@
     <ClCompile Include="CppServer.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="HttpParser.cpp" />
+    <ClCompile Include="IHandler.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -170,6 +172,14 @@
     </ClCompile>
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="WinSockHelper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Constants\Constants.vcxproj">
+      <Project>{31390ca7-f7fe-4254-a9a3-63a179111d7b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Lib\Lib.vcxproj">
+      <Project>{95dc3054-beb2-4c78-8478-4d9d37a92b3e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,3 +2,6 @@
 .vs/CppServer/v15/Browse.VC.opendb
 .vs/CppServer/v15/Browse.VC.db
 .vs/CppServer/v15/.suo
+.vs/CppServer/v15/ipch/AutoPCH/f00dd1794e08015f/HTTPRESPONSE.ipch
+.vs/CppServer/v15/ipch/AutoPCH/e8384294b1affd5/HTTPREQUEST.ipch
+.vs/CppServer/v15/ipch/AutoPCH/86f05a3869860ecf/STRINGHELPER.ipch

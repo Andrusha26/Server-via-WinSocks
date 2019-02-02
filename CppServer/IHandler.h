@@ -1,8 +1,11 @@
 #pragma once
+#include "HttpRequest.h"
+#include "HttpResponse.h"
+
 #include <WinSock2.h>
 class IHandler {
-protected:
-	const int DefaultBufferLength = 1024;
 public:
-	virtual void handle(SOCKET, char *, int) = 0;
+	virtual void handle(SOCKET, HttpRequest &) = 0;
+	virtual HttpResponse * generateResponse() = 0;
+	~IHandler();
 };

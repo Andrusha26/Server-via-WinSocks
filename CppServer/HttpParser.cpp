@@ -1,19 +1,15 @@
 #include "pch.h"
 #include "HttpParser.h"
 #include "FileHandler.h"
+#include "HttpRequest.h"
 
 #include <vector>
 #include <iterator>
 #include <sstream>
 
-IHandler *HttpParser::parseHttpRequest(char * request)
+IHandler *HttpParser::parseHttpRequest(HttpRequest &request)
 {
-	std::istringstream iss(request);
-	std::vector<std::string> httpTokens((std::istream_iterator<std::string>(iss)),
-		std::istream_iterator<std::string>());
-	
-
-	if (httpTokens[1] == "/file")
+	if (request.getUrl() == "/file")
 		return new FileHandler();
 }
 

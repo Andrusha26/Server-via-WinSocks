@@ -1,12 +1,17 @@
 #pragma once
 #include "IHandler.h"
+#include "HttpRequest.h"
 
 class FileHandler : public IHandler
 {
 private:
-	void receive(SOCKET, char *, int);
+	void receive(SOCKET,HttpRequest &);
+	void sendResponse(SOCKET, HttpResponse &);
+	HttpResponse * genereteOkResponse(std::string &);
 public:
-	void handle(SOCKET, char *, int) override;
+	void handle(SOCKET, HttpRequest &) override;
+	HttpResponse * generateResponse() override;
+
 	FileHandler();
 	~FileHandler();
 };

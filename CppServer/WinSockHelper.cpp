@@ -67,6 +67,12 @@ void WinSockHelper::bindListenSocket(SOCKET &listenSocket)
 	freeaddrinfo(_listenAddrInfo);
 }
 
+void WinSockHelper::cleanUp(SOCKET socket)
+{
+	closesocket(socket);
+	WSACleanup();
+}
+
 WinSockHelper::WinSockHelper()
 {
 	loadWinSock();
