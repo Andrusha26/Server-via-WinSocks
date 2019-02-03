@@ -44,3 +44,5 @@ CppServer/x64/Debug/IHandler.obj
 CppServer/x64/Debug/HttpParser.obj
 CppServer/x64/Debug/FileHandler.obj
 CppServer/x64/Debug/CppServer.tlog/link.write.1.tlog
+CppServer/CppServer.vcxproj
+CppServer/CppServer.vcxproj.filters

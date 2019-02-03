@@ -64,21 +64,21 @@ void FileHandler::sendResponse(SOCKET clientSocket, HttpResponse & response)
 	}
 }
 
-HttpResponse * FileHandler::genereteOkResponse(std::string &body)
+HttpResponse * FileHandler::genereteOkResponse(std::string *body)
 {
 	HttpResponse *response = new HttpResponse(200, "OK");
 
 	std::map<std::string, std::string> headers;
 	headers.insert(std::pair<std::string, std::string>("Version", "HTTP/1.1"));
 	
-	if(body.length() != 0) 
-		headers.insert(std::pair<std::string, std::string>("Content-Length:", std::to_string(body.length())));
+	if(body->length() != 0) 
+		headers.insert(std::pair<std::string, std::string>("Content-Length", std::to_string(body->length())));
 
 	headers.insert(std::pair<std::string, std::string>("Connection", "Closed"));
 	headers.insert(std::pair<std::string, std::string>("Content-Type", "text/html"));
 	response->setHeaders(headers);
 
-	response->setBody(body.c_str());
+	response->setBody(body->c_str());
 
 	return response;
 }
@@ -94,7 +94,7 @@ void FileHandler::handle(SOCKET clientSocket, HttpRequest & request)
 
 HttpResponse * FileHandler::generateResponse()
 {
-	std::string responseMessage("File is uploaded.");
+	std::string *responseMessage = new std::string("File is uploaded.");
 	return genereteOkResponse(responseMessage);
 }
 
