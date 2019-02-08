@@ -1,12 +1,14 @@
 #pragma once
 #include "IHandler.h"
-#include "HttpRequest.h"
+#include "HttpResponse.h"
 
-class DefaultHandler : public IHandler
+class DefaultHandler :public IHandler
 {
+	HttpResponse *generateNotFoundResponse(const std::string *);
+	void sendResponse(SOCKET, HttpResponse &);
 public:
 	void handle(SOCKET, HttpRequest &) override;
-	HttpResponse * generateResponse() override;
+
 	DefaultHandler();
 	~DefaultHandler();
 };

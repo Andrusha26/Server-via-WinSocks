@@ -49,12 +49,12 @@ char * HttpRequest::getBody()
 	return _body;
 }
 
-int HttpRequest::getBodyLength()
+size_t HttpRequest::getBodyLength()
 {
 	return _bodyLength;
 }
 
-int HttpRequest::getRequestLength()
+size_t HttpRequest::getRequestLength()
 {
 	return _requestLength;
 }
@@ -77,7 +77,7 @@ HttpRequest::HttpRequest(char * requestBuffer, int requestLength)
 	parseHeaders(headers);
 	
 	//4 - length of "\r\n\r\n"
-	int headerLength = headers.length() + 4;
+	size_t headerLength = headers.length() + 4;
 	_body = requestBuffer + headerLength;
 	_bodyLength = requestLength - headerLength;
 }

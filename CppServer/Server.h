@@ -17,13 +17,11 @@ private:
 	void releaseConnection();
 
 	void startListening();
-	SOCKET & acceptConnection();
+	void acceptConnection(SOCKET&);
 
 	void acceptAndBroadcast();
 
 	void broadcastMessages(SOCKET);
-	int sendMessage(SOCKET &, const char* const&);
-
 	void closeConnection(SOCKET &);
 public:
 	void start();

@@ -33,16 +33,14 @@ void Server::startListening()
 	}
 }
 
-SOCKET &Server::acceptConnection()
+ void Server::acceptConnection(SOCKET & socket)
 {
-	SOCKET clientSocket = accept(_listenSocket, NULL, NULL);
+	socket = accept(_listenSocket, NULL, NULL);
 
-	if (clientSocket == INVALID_SOCKET) {
+	if (socket == INVALID_SOCKET) {
 		std::cout << "accept failed with error: " << WSAGetLastError() << std::endl;
-		WinSockHelper::cleanUp(_listenSocket);
+		closeConnection(socket);
 	}
-
-	return clientSocket;
 }
 
 void Server::acceptAndBroadcast()
@@ -50,13 +48,18 @@ void Server::acceptAndBroadcast()
 	while (_running) {
 		std::vector<std::thread*> threads;
 
-		//TODO add release logic
 		while (_currentConnections < Consts::MaxConnections && _running) {
-			SOCKET clientSocket = acceptConnection();
+			SOCKET clientSocket;
+			acceptConnection(clientSocket);
+
+			if (clientSocket == INVALID_SOCKET)
+				continue;
+
 			std::cout << "socket " << clientSocket << " was accepted." << std::endl;
 			std::thread *broadcastThread = new std::thread(&Server::broadcastMessages, this, clientSocket);
 
 			threads.push_back(broadcastThread);
+			_currentConnections++;
 		}
 
 		if (!_running) {
@@ -67,15 +70,18 @@ void Server::acceptAndBroadcast()
 			threadIterator != threads.end();
 			threadIterator++) {
 			(*threadIterator)->join();
-			//TODO delete thread?
+			delete *threadIterator;
 		}
+		_currentConnections = 0;
 	}
 }
 
 void Server::broadcastMessages(SOCKET clientSocket)
 {
 	char * buffer = new char[Consts::DefaultBufferLength];
-	while (_running) {
+	bool connection = true;
+
+	while (connection) {
 		int recvResult = recv(clientSocket, buffer, Consts::DefaultBufferLength, 0);
 
 		if (recvResult > 0) {
@@ -83,54 +89,19 @@ void Server::broadcastMessages(SOCKET clientSocket)
 
 			IHandler *handler = _httpParser->parseHttpRequest(request);
 			handler->handle(clientSocket, request);
-			//delete handler;
+
+			delete handler;
+			connection = false;
 		}
 		else if (recvResult <= 0) {
-			std::cout << "recv failed with error in " << clientSocket << " socket: " << WSAGetLastError() << std::endl;
-			WinSockHelper::cleanUp(clientSocket);
-
-			_running = false;
+			std::cout << "recv failed with error " << recvResult << " in " << clientSocket << " socket: " << WSAGetLastError() << std::endl;
+			
+			connection = false;
 		}
 	}
 
 	closeConnection(clientSocket);
 	delete buffer;
-}
-
-int Server::sendMessage(SOCKET & clientSocket, const char * const & body = nullptr)
-{
-	std::stringstream response;
-	response <<
-		"HTTP/1.1 200 OK" << std::endl <<
-		"Version: HTTP/1.1" << std::endl;
-
-		if (body != nullptr)
-			response << "Content-Length: " << strlen(body) << std::endl;
-		 
-	response <<
-		"Content-Type: text/html" << std::endl <<
-		"Connection: Closed" << std::endl;
-
-	response << std::endl << body;
-
-	////////////////////////////////////////////////
-	std::string TESTREMOVE = response.str();
-	int length = response.str().length();
-	////////////////////////////////////////////////
-
-	// Echo the buffer back to the sender
-	int sendResult = send(clientSocket, response.str().c_str(), response.str().length(), 0);
-	
-	if (sendResult == SOCKET_ERROR) {
-		std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
-		WinSockHelper::cleanUp(clientSocket);
-
-		_running = false;
-		throw new std::exception("Cannot send message.");
-	}
-
-	std::cout << "Bytes sent to " << clientSocket << " socket: " << sendResult << std::endl;
-	return sendResult;
 }
 
 void Server::closeConnection(SOCKET & clientSocket)

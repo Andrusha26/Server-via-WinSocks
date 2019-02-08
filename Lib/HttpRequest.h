@@ -6,8 +6,8 @@ class HttpRequest
 {
 	std::map<std::string, std::string> _headers;
 	char * _body;
-	int _bodyLength;
-	int _requestLength;
+	size_t _bodyLength;
+	size_t _requestLength;
 	std::string _method;
 	std::string _url;
 
@@ -15,8 +15,8 @@ class HttpRequest
 public:
 	std::string  &getHeaderValueByKey(std::string&);
 	char * getBody();
-	int getBodyLength();
-	int getRequestLength();
+	size_t getBodyLength();
+	size_t getRequestLength();
 	std::string getMethod();
 	std::string getUrl();
 

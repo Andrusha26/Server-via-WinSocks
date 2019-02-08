@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DefaultHandler.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="HttpParser.h" />
     <ClInclude Include="IHandler.h" />
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppServer.cpp" />
+    <ClCompile Include="DefaultHandler.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="HttpParser.cpp" />
     <ClCompile Include="IHandler.cpp" />

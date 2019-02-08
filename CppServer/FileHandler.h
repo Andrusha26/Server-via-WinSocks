@@ -5,12 +5,13 @@
 class FileHandler : public IHandler
 {
 private:
-	void receive(SOCKET,HttpRequest &);
-	void sendResponse(SOCKET, HttpResponse &);
-	HttpResponse * genereteOkResponse(std::string *);
+	bool receive(SOCKET,HttpRequest &);
+	bool sendResponse(SOCKET, HttpResponse &);
+
+	HttpResponse *genereteOkResponse(const std::string *);
+	HttpResponse *generateNotFoundResponse(const std::string *);
 public:
 	void handle(SOCKET, HttpRequest &) override;
-	HttpResponse * generateResponse() override;
 
 	FileHandler();
 	~FileHandler();

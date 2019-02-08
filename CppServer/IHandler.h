@@ -6,6 +6,5 @@
 class IHandler {
 public:
 	virtual void handle(SOCKET, HttpRequest &) = 0;
-	virtual HttpResponse * generateResponse() = 0;
 	~IHandler();
 };
